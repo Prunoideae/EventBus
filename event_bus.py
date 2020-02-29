@@ -1,5 +1,6 @@
 from functools import partial, wraps
 from event import EventBase, Cancelled
+from inspect import signature
 
 __eventbus__ = {}
 
@@ -33,7 +34,9 @@ def subscribe(func=None, *, priority=0):
 
     anno_dict = list(func.__annotations__.items())
 
-    if len(anno_dict) != 1:
+    sig = signature(func)
+
+    if len(sig.parameters) != 1:
         raise TypeError("Hook requires only 1 parameter!")
 
     event = anno_dict[0][1]
