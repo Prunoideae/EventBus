@@ -1,5 +1,5 @@
 from functools import partial, wraps
-from event import EventBase, Cancelled
+from event import EventBase, Cancelled, EventCommon
 from inspect import signature
 
 __eventbus__ = {}
@@ -8,24 +8,28 @@ __eventbus__ = {}
 def post(event: EventBase):
     triggered = [event.__class__]
 
-    def recursive(clazz, trigger: list):
-        for base in clazz.__bases__:
-            if issubclass(base, EventBase) and \
-                base not in trigger and \
-                    base != object:
-                trigger.append(base)
-                recursive(base, trigger)
+    # CancelEvent will NOT trigger event chain
+    if not isinstance(event, EventCommon.Cancelled):
+        def recursive(clazz, trigger: list):
+            for base in clazz.__bases__:
+                if issubclass(base, EventBase) and \
+                    base not in trigger and \
+                        base != object:
+                    trigger.append(base)
+                    recursive(base, trigger)
 
-    recursive(event.__class__, triggered)
+        recursive(event.__class__, triggered)
 
-    triggered = [x for x in triggered if x in __eventbus__]
+        triggered = [x for x in triggered if x in __eventbus__]
 
     try:
         for t in triggered:
             for hook in __eventbus__[t]:
                 hook[0](event)
     except Cancelled:
-        pass
+        if isinstance(event, EventCommon):
+            cancelled = event.__class__.Cancelled(event)
+            post(cancelled)
 
 
 def subscribe(func=None, *, priority=0):

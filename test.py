@@ -1,8 +1,8 @@
 from event_bus import subscribe, post
-from event import EventBase, EventExplicit
+from event import EventBase, EventExplicit, EventCommon
 
 
-class SomeEvent(EventBase):
+class SomeEvent(EventCommon):
     def __init__(self, foo: int):
         super().__init__()
         self.foo = foo
@@ -13,18 +13,23 @@ class SomeEvent(EventBase):
 
 
 @subscribe
-def hook(event: SomeEvent):
-    print(1)
+def cancel_hook(event: SomeEvent.Cancelled):
+    print("Event was cancelled!")
 
 
 @subscribe
-def base(event: EventBase):
-    print(2)
+def cancelled_hook(event: SomeEvent):
+    print("I'm not being called!")
+
+
+@subscribe(priority=2)
+def survivor(event: SomeEvent):
+    print("I'm printed before cancelled!")
 
 
 @subscribe(priority=1)
-def hook2(event: SomeEvent):
-    # event.cancel()
+def killer(event: SomeEvent):
+    event.cancel()
     pass
 
 

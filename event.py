@@ -10,7 +10,20 @@ class EventBase():
         raise Cancelled()
 
 
-class EventExplicit(EventBase):
+class EventCommon(EventBase):
+    def __init__(self):
+        super().__init__()
+
+    class Cancelled(EventBase):
+        def __init__(self, event):
+            super().__init__()
+            self.event = event
+
+        def cancel(self):
+            raise RuntimeError("This event is not cancellable!")
+
+
+class EventExplicit(EventCommon):
     def __init__(self):
         super().__init__()
 
