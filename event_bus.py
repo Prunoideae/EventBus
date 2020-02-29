@@ -10,7 +10,7 @@ def post(event: EventBase):
 
     def recursive(clazz, trigger: list):
         for base in clazz.__bases__:
-            if isinstance(base, EventBase.__class__) and \
+            if issubclass(base, EventBase) and \
                 base not in trigger and \
                     base != object:
                 trigger.append(base)
@@ -43,8 +43,6 @@ def subscribe(func=None, *, priority=0):
 
     if not issubclass(event, EventBase):
         raise TypeError("Event listening is not derived from EventBase!")
-    if not isinstance(event, EventBase.__class__):
-        raise TypeError("Event type must be an instance of EventBase!")
 
     if event not in __eventbus__:
         __eventbus__[event] = []
