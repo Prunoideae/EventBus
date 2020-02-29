@@ -27,10 +27,19 @@ def post(event: EventBase):
         pass
 
 
-def subscribe(func=None, *, event: EventBase = None, priority=0):
+def subscribe(func=None, *, priority=0):
     if func is None:
-        return partial(subscribe, event=event, priority=priority)
+        return partial(subscribe, priority=priority)
 
+    anno_dict = list(func.__annotations__.items())
+
+    if len(anno_dict) != 1:
+        raise TypeError("Hook requires only 1 parameter!")
+
+    event = anno_dict[0][1]
+
+    if not issubclass(event, EventBase):
+        raise TypeError("Event listening is not derived from EventBase!")
     if not isinstance(event, EventBase.__class__):
         raise TypeError("Event type must be an instance of EventBase!")
 

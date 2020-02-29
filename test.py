@@ -12,19 +12,19 @@ class SomeEvent(EventBase):
         self.callback = func
 
 
-@subscribe(event=SomeEvent)
+@subscribe
 def hook(event: SomeEvent):
     print(1)
 
 
-@subscribe(event=EventBase)
+@subscribe
 def base(event: EventBase):
     print(2)
 
 
-@subscribe(event=SomeEvent, priority=1)
+@subscribe(priority=1)
 def hook2(event: SomeEvent):
-    #event.cancel()
+    # event.cancel()
     pass
 
 
