@@ -36,8 +36,9 @@ def subscribe(func=None, *, priority=0):
 
     sig = signature(func)
 
-    if len(sig.parameters) != 1:
-        raise TypeError("Hook requires only 1 parameter!")
+    if len(sig.parameters) != 1 or len(anno_dict) != 1:
+        raise TypeError(
+            "Hook requires and only requires 1 annotated parameter!")
 
     event = anno_dict[0][1]
 
