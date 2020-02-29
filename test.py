@@ -14,10 +14,19 @@ class SomeEvent(EventBase):
 
 @subscribe(event=SomeEvent)
 def hook(event: SomeEvent):
-    def bar():
-        print(1)
-    event.set_callback(bar)
+    print(1)
+
+
+@subscribe(event=EventBase)
+def base(event: EventBase):
+    print(2)
+
+
+@subscribe(event=SomeEvent, priority=1)
+def hook2(event: SomeEvent):
+    #event.cancel()
+    pass
+
 
 inst = SomeEvent(1)
 post(inst)
-inst.callback()
